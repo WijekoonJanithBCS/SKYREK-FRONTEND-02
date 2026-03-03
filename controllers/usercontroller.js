@@ -15,12 +15,12 @@ export function createUser(req, res) {
 
     user.save()
         .then(result => {
-            res.status(201).json({
+            return res.status(201).json({
                 message: 'User created successfully',
             });
         })
         .catch(err => {
-            res.status(500).json({
+            return res.status(500).json({
                 message: 'Error creating user',
             });
         });
@@ -30,7 +30,7 @@ export function loginuser(req, res) {
     User.findOne({ email: req.body.email })
         .then((user)=>{
             if(user==null){
-                res.status(404).json({
+                return res.status(404).json({
                     message: 'User with given email not found',
                 });
             }
@@ -50,12 +50,13 @@ export function loginuser(req, res) {
                            
                     console.log(token);
 
-                    res.status(200).json({
+                    return res.status(200).json({
                         message: 'Login successful',
+                        token: token
                     });
                 }
                 else{
-                    res.status(401).json({
+                    return res.status(401).json({
                         message: 'Invalid password',
                     });
                 }
