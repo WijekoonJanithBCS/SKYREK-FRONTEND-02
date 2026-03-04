@@ -153,6 +153,35 @@ export async function Createproduct(req, res) {
 
 }
 
+export async function getProductById(req, res) {
+    try {
+        const productId = req.params.productId;
+        const product = await Product.findOne({productId: productId});
+        if(product==null){
+            return res.status(404).json({
+                message: "Product with given id not found"
+            });
+        }
+        if(!product.isVisible) {
+            if(!isAdmin(req)){
+                return res.status(404).json({
+                    message: "Forbidden, only admin can access this product"
+                });
+            }
+        }
+        return res.status(200).json({
+            message: "Product fetched successfully",
+            product: product
+        });
+    }
+        
+    catch(error) {
+        return res.status(500).json({
+            message: "Error fetching product"
+        });
+    }
+}
+
 
 
 
