@@ -29,9 +29,9 @@ const productSchema = new mongoose.Schema({
         type: String,
         default:"others"
     },
-    image: {
-        type: String,
-        default: "https://picsum.photos/200/300",
+    images: {
+        type: [String],
+        default: []
     },
     isVisible: {
         type: Boolean,

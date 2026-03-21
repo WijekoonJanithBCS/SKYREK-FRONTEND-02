@@ -50,7 +50,7 @@ export function loginuser(req, res) {
                         
                     } , process.env.JWT_SECRET )
                            
-                    console.log(token);
+                    //console.log(token);
 
                     return res.status(200).json({
                         message: 'Login successful',

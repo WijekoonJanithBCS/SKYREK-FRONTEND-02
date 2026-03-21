@@ -40,7 +40,7 @@ export async function Createproduct(req, res) {
         data.price = req.body.price;
         data.labelledPrice = req.body.labelledPrice || req.body.price
         data.category = req.body.category || "others"
-        data.image = req.body.image || "https://picsum.photos/200/300"
+        data.images = req.body.images || [];
         data.isVisible = req.body.isVisible
         data.brand = req.body.brand || "Generic"
         data.model = req.body.model || "Standard"
@@ -62,6 +62,7 @@ export async function Createproduct(req, res) {
    }
 }
    export async function getProducts(req, res) {
+    //console.log("Get products API called")
     try {
         if(isAdmin(req)){
              const products = await Product.find();
@@ -105,51 +106,51 @@ export async function Createproduct(req, res) {
     }
     export async function updateProduct(req, res) {
          if(!isAdmin (req)){
-    return res.status(403).json({
-        message: "Forbidden, only admin can create products"
-    });
-   }
-   try {
-        const productId = req.params.productId;
-
-        const data= {}
-
-        if(req.body.name==null || req.body.name==""){
-            return res.status(400).json({
-                message: "Product name is required"
-            });
+            return res.status(403).json({
+            message: "Forbidden, only admin can update products"
+        })
         }
-        data.name = req.body.name;
+        try {
+            const productId = req.params.productId;
 
-        data.description = req.body.description || ""
-        data.altNames = req.body.altNames || []
-        if(req.body.price==null){
-            return res.status(400).json({
-                message: "Product price is required"
-            });
-        }
-        data.price = req.body.price;
-        data.labelledPrice = req.body.labelledPrice || req.body.price
-        data.category = req.body.category || "others"
-        data.image = req.body.image || "https://picsum.photos/200/300"
-        data.isVisible = req.body.isVisible
-        data.brand = req.body.brand || "Generic"
-        data.model = req.body.model || "Standard"
+            const data= {}
 
-        
-        const product= await Product.findOneAndUpdate({productId: productId}, data, {new: true});
-        return res.status(201).json({
-            message: "Product updated successfully",
+            if(req.body.name==null || req.body.name==""){
+                return res.status(400).json({
+                    message: "Product name is required"
+                });
+            }
+            data.name = req.body.name;
+
+            data.description = req.body.description || ""
+            data.altNames = req.body.altNames || []
+            if(req.body.price==null){
+                return res.status(400).json({
+                    message: "Product price is required"
+                });
+            }
+            data.price = req.body.price;
+            data.labelledPrice = req.body.labelledPrice || req.body.price
+            data.category = req.body.category || "others"
+            data.images = req.body.images || [];
+            data.isVisible = req.body.isVisible
+            data.brand = req.body.brand || "Generic"
+            data.model = req.body.model || "Standard"
+
             
-        });
+            const product= await Product.findOneAndUpdate({productId: productId}, data, {new: true});
+            return res.status(200).json({
+                message: "Product updated successfully",
+                
+            });
 
-   }
-   catch(error ) {
-    return res.status(500).json({
-        message: "Error updating product",
-        error: error.message
-    });
-   }
+    }
+    catch(error ) {
+        return res.status(500).json({
+            message: "Error updating product",
+            error: error.message
+        });
+    }
 
 }
 
