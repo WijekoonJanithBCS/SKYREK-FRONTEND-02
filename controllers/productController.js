@@ -61,11 +61,11 @@ export async function Createproduct(req, res) {
     });
    }
 }
-   export async function getProducts(req, res) {
+export async function getProducts(req, res) {
     //console.log("Get products API called")
     try {
         if(isAdmin(req)){
-             const products = await Product.find();
+            const products = await Product.find();
             return res.status(200).json({
             message: "Products fetched successfully",
             products: products
@@ -74,7 +74,7 @@ export async function Createproduct(req, res) {
         else{
             const products = await Product.find({isVisible: true});
             return res.status(200).json({
-            message: "Products fetched successfully for customers...",
+            message: "Products fetched successfully",
             products: products
         });
         }
@@ -103,8 +103,8 @@ export async function Createproduct(req, res) {
                 message: "Error deleting product"
             });
         }
-    }
-    export async function updateProduct(req, res) {
+}
+export async function updateProduct(req, res) {
          if(!isAdmin (req)){
             return res.status(403).json({
             message: "Forbidden, only admin can update products"

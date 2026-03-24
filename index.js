@@ -2,8 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import userRouter from "./Routers/userRouter.js";
 import productRouter from "./Routers/productRouter.js";
-import jwt from "jsonwebtoken";
-import authorizeUser from "./lib/jwtMiddleware.js";
+//import jwt from "jsonwebtoken";
+//import authorizeUser from "./lib/jwtMiddleware.js";
 import cors from 'cors';
 import dotenv from 'dotenv'
 dotenv.config()
@@ -33,7 +33,7 @@ app.use(express.json());
 
 app.use("/api/users", userRouter);
 
-app.use("/api/products", authorizeUser, productRouter);
+app.use("/api/products", productRouter);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000...");
