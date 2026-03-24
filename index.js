@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import userRouter from "./Routers/userRouter.js";
 import productRouter from "./Routers/productRouter.js";
 //import jwt from "jsonwebtoken";
-//import authorizeUser from "./lib/jwtMiddleware.js";
+import authorizeUser from "./lib/jwtMiddleware.js";
 import cors from 'cors';
 import dotenv from 'dotenv'
 dotenv.config()
@@ -29,7 +29,7 @@ app.use(cors())
 
 app.use(express.json());
 
-//app.use(authorizeUser);
+app.use(authorizeUser);
 
 app.use("/api/users", userRouter);
 
