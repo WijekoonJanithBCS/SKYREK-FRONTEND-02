@@ -86,7 +86,7 @@ export async function getProducts(req, res) {
         });
     }
 }
-    export async function deleteProduct(req, res) {
+export async function deleteProduct(req, res) {
         if(!isAdmin(req)){
             return res.status(403).json({
                 message: "Forbidden, only admin can delete products"
