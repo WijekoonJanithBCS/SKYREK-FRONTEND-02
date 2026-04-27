@@ -23,7 +23,7 @@ const productSchema = new mongoose.Schema({
         required: true
     },
     labelledPrice: {
-        type: String,
+        type: Number,
     },
     category: {
         type: String,
@@ -46,6 +46,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         default: "Standard"
     },
+    qty: {
+        type: Number,
+        default: 100
+    }
 });
 
 const Product = mongoose.model('Product', productSchema);
