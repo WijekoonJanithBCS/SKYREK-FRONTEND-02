@@ -3,6 +3,12 @@ import Product from "../models/product.js";
 
 export async function CreateOrder(req, res) {
     //let orderId = "ORD000001";
+    if(req.user == null){
+        return res.status(401).json({
+            message: "Unauthorized.please log in to place an order"
+        });
+        return;
+    }
 
     try{
                 const orderData={
@@ -16,35 +22,35 @@ export async function CreateOrder(req, res) {
                 postalCode: req.body.postalCode,
                 email: req.user.email,
                 items: [],
-                phone: req.body.phone,
-                total: 0,
+                phoneNumber: req.body.phoneNumber,
+                totalAmount: 0,
             }
 
-            if(firstName== ""){
-                orderData.firstName = req.user.firstName;
+            if(req.body.firstName== ""){
+                req.body.firstName = req.user.firstName;
             }
-            if(lastName== ""){
-                orderData.lastName = req.user.lastName;
+            if(req.body.lastName== ""){
+                req.body.lastName = req.user.lastName;
             }
-            if(addressLine1== ""){
+            if(req.body.addressLine1== ""){
                 res.status(400).json({
                     message: "Address Line 1 is required"
                 });
                 return;
             }
-            if(addressLine2== ""){
+            if(req.body.addressLine2== ""){
                 res.status(400).json({
                     message: "Address Line 2 is required"
                 });
                 return;
             }
-            if(city== ""){
+            if(req.body.city== ""){
                 res.status(400).json({
                     message: "City is required"
                 });
                 return;
             }
-            if(postalCode== ""){
+            if(req.body.postalCode== ""){
                 res.status(400).json({
                     message: "Postal Code is required"
                 });
@@ -85,8 +91,8 @@ export async function CreateOrder(req, res) {
                 image: product.images[0],
                 qty: item.qty  
                 }); 
-                orderData.total += product.price * item.qty;
-                orderData.totalAmount = req.body.totalAmount;
+                orderData.totalAmount += product.price * item.qty;
+                //orderData.totalAmount = req.body.totalAmount;
             }
             const order = new Order(orderData);
             await order.save();
