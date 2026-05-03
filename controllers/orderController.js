@@ -1,5 +1,7 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
+import { isAdmin } from "./usercontroller.js";
+
 
 export async function CreateOrder(req, res) {
     //let orderId = "ORD000001";
@@ -116,3 +118,48 @@ export async function CreateOrder(req, res) {
 
 
 }
+export async function GetOrders(req, res) {
+    if(req.user == null){
+        return res.status(401).json({
+            message: "Unauthorized.please log in to view your orders"
+        });
+        return;
+    }
+    const pageSizeInString = req.params.pageSize || "10";
+    const pageNumberInString = req.params.pageNumber || "1";
+    const pageSize = parseInt(pageSizeInString);
+    const pageNumber = parseInt(pageNumberInString);
+
+    try{
+        if(isAdmin(req)){
+        const numberOfOrders = await Order.countDocuments();
+        const numberOfPages = Math.ceil(numberOfOrders / pageSize);
+        const orders = await Order.find().sort({ date: -1 }).skip((pageNumber - 1) * pageSize).limit(pageSize);
+        res.json({
+            orders: orders,
+            totalPages: numberOfPages
+        });
+        }
+        else{
+            const numberOfOrders = await Order.countDocuments();
+            const numberOfPages = Math.ceil(numberOfOrders / pageSize);
+            const orders = await Order.find({email: req.user.email}).sort({ date: -1 }).skip((pageNumber - 1) * pageSize).limit(pageSize);
+            res.json({
+                orders: orders,
+                totalPages: numberOfPages
+            });
+        
+        }
+    }
+    
+    catch(error){
+        console.log("Error counting orders: ", error);
+        return res.status(500).json({
+            message: "Error counting orders",
+            error: error.message
+        });
+    }
+}
+
+    
+    
