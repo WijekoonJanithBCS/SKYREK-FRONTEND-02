@@ -67,6 +67,57 @@ export function loginuser(req, res) {
         })
 }
 
+export function getUser(req, res) {
+    if(req.user == null){
+        return res.status(401).json({
+            message: 'Unauthorized',
+        });
+    }
+    res.json({
+        email: req.user.email,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        role: req.user.role,
+        image: req.user.image,
+        isEmailVerified: req.user.isEmailVerified
+    });
+}
+
+export async function updateUserProfile(req, res){
+    if(req.user == null){
+        res.status(401).json({
+            message: "unauthorized"
+        })
+        return
+    }
+    try{
+        await User.updateOne({email: req.user.email}, {firstName: req.body.firstName, lastName: req.body.lastName, image: req.body.image})
+    }
+    catch(error){
+        res.status(500).json({message: "error updating profile", error: error})
+    }
+    
+}
+
+export async function ChangeUserPassowrd(req, res){
+    if(req.user==null){
+        res.status(401).json({
+            message: "unauthorized"
+        })
+        return
+    }
+    try{
+        const hashedPassword = bcrypt.hashSync((req.body.password, 10));
+         await User.updateOne({email: req.user.email}, {password: hashedPassword})
+         res.json({
+            message: "password changed successfully"
+         })
+    }
+    catch(error){
+        res.status(500).json({message: "error creating password", error: error})
+    }
+}
+
 export function isAdmin(req){
     if(req.user == null){
         return false;
@@ -76,3 +127,5 @@ export function isAdmin(req){
     }
     return true;
 }
+
+

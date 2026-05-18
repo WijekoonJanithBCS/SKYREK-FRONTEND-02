@@ -1,7 +1,7 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
 import { isAdmin } from "./usercontroller.js";
-
+//import express from "express";
 
 export async function CreateOrder(req, res) {
     //let orderId = "ORD000001";
@@ -151,6 +151,9 @@ export async function GetOrders(req, res) {
         
         }
     }
+
+   
+         
     
     catch(error){
         console.log("Error counting orders: ", error);
@@ -159,6 +162,32 @@ export async function GetOrders(req, res) {
             error: error.message
         });
     }
+}
+
+    export async function updateOrderStatusAndNotes(req, res) {
+        if(isAdmin(req)){
+            const orderId = req.params.orderId;
+            try{
+                await Order.updateOne({orderId: orderId},  {status: req.body.status, notes: req.body.notes});
+            res.json({
+                message: "Order status and notes updated successfully"
+            });   
+            }
+            
+            catch(error){
+                console.log("Error updating order status and notes: ", error);
+                return res.status(500).json({
+                    message: "Error updating order status and notes",
+                    error: error.message
+                });
+            }
+        }   
+        else{
+            return res.status(403).json({
+                message: "Forbidden. Only admin can update order status and notes"
+            });
+        }
+     
 }
 
     
