@@ -49,6 +49,7 @@ export function loginuser(req, res) {
                         isEmailVerified: user.isEmailVerified
                         
                     } , process.env.JWT_SECRET )
+                   
                            
                     //console.log(token);
 
@@ -92,9 +93,24 @@ export async function updateUserProfile(req, res){
     }
     try{
         await User.updateOne({email: req.user.email}, {firstName: req.body.firstName, lastName: req.body.lastName, image: req.body.image})
+        const user = await User.findOne({email: req.user.email})
+         const token = jwt.sign({
+                        email: user.email,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        role: user.role,
+                        image: user.image,
+                        isEmailVerified: user.isEmailVerified
+                        
+                    } , process.env.JWT_SECRET )
+                    
+                    res.json({
+                        message: "profile updated successfully", token: token
+                    })
+                   
     }
     catch(error){
-        res.status(500).json({message: "error updating profile", error: error})
+        res.json({message: "error updating profile", error: error})
     }
     
 }
@@ -107,7 +123,7 @@ export async function ChangeUserPassowrd(req, res){
         return
     }
     try{
-        const hashedPassword = bcrypt.hashSync((req.body.password, 10));
+        const hashedPassword = bcrypt.hashSync(req.body.password, 10); // no need double bracets 
          await User.updateOne({email: req.user.email}, {password: hashedPassword})
          res.json({
             message: "password changed successfully"
@@ -115,6 +131,7 @@ export async function ChangeUserPassowrd(req, res){
     }
     catch(error){
         res.status(500).json({message: "error creating password", error: error})
+        console.log(error)
     }
 }
 

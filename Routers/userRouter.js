@@ -7,10 +7,10 @@ userRouter.post("/", createUser)
 
 userRouter.post("/login", loginuser)
 
-userRouter.post("/update-password", ChangeUserPassowrd)
+userRouter.put("/update-password", ChangeUserPassowrd)
 
 userRouter.get("/profile", getUser )
 
-userRouter.put("/", updateUserProfile)
+userRouter.put("/updateUserProfile", updateUserProfile)
 
 export default userRouter;
