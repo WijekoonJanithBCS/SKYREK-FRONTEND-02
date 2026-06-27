@@ -2,7 +2,21 @@ import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv'
+import OTP from '../models/otp.js';
+import nodemailer from 'nodemailer';
 dotenv.config()
+
+const transporter= nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user:"wijekoonjanith72@gmail.com",
+        pass: process.env.GMAIL_APP_PASSWORD
+    }
+})
+        
 
 export function createUser(req, res) {
 
@@ -145,4 +159,79 @@ export function isAdmin(req){
     return true;
 }
 
+export async function sendOTP(req, res){
+    try{
+        const user = await User.findOne({email: req.body.email})
+        if(user==null){
+            res.status(404).json({
+                message: "user not found"
+            })
+            return
+        }
+        //generate OTP between 100000 and 999999
+        const otp = Math.floor(100000 + Math.random() * 900000);
+
+        await OTP.deleteMany({email: req.body.email});
+
+        const newOTP = new OTP({
+            email: req.body.email,
+            otp: otp
+        });
+        await newOTP.save();
+        const message = {
+            from: "wijekoonjanith72@gmail.com",
+            to: req.body.email,
+            subject: "OTP for password reset",
+            text: `Your OTP for password reset is ${otp}`
+        
+        }
+        transporter.sendMail(message, (err, info)=>{
+            if(err){
+                console.log("Error sending OTP:", err);
+                res.status(500).json({message: "error sending OTP", error: err})
+                
+            }
+            else{
+                console.log("OTP sent successfully:", info.response);
+                res.json({message: "OTP sent successfully"})
+
+            }
+        })
+    }
+    catch(error){
+        res.status(500).json({message: "error sending OTP", error: error})
+
+    }
+
+}
+
+export async function verifyOTP(req, res){
+    try{
+        const otpCode = req.body.otp;
+        const email= req.body.email;
+        const newPassword = req.body.newPassword;
+
+        const otp = await OTP.findOne({email: email,});
+        if(otp==null){
+            res.status(404).json({
+                message: "OTP not found for the given email"})
+            return
+        }
+        if(otp.otp != otpCode){
+            res.status(400).json({
+                message: "Invalid OTP"})
+            return
+        }
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+        await User.updateOne({email: email}, {password: hashedPassword})
+        await OTP.deleteOne({email: email})
+        res.json({
+            message: "Password reset successfully",
+            
+        })
+    }
+    catch(error){
+        res.status(500).json({message: "error verifying OTP", error: error})
+    }
+}
 
