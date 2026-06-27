@@ -235,3 +235,21 @@ export async function verifyOTP(req, res){
     }
 }
 
+export async function googleLogin(req, res){
+    try{
+        const googleresponse = await axios.get ("https://www.googleapis.com/oauth2/v3/userinfo", {
+            headers: {
+                Authorization : "Bearer" + req.body.token
+            }
+        })
+        console.log(googleResponse)
+        const user = await User.findOne({email : googleResponse.data.email})
+        if(user ==null){
+            
+        }
+    }
+    catch(error){
+        res.status(500).json({message: "Error logging in with google", error: error})
+    }
+}
+
