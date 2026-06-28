@@ -244,8 +244,54 @@ export async function googleLogin(req, res){
         })
         console.log(googleResponse)
         const user = await User.findOne({email : googleResponse.data.email})
+        console.log(user)
+        
         if(user ==null){
-            
+            const newUser = new User({
+                email: googleResponse.data.email,
+                firstName: googleResponse.data.given_name,
+                lastName: googleResponse.data.family_name,
+                password: "google-login",
+                image: googleResponse.data.picture,
+                isEmailVerified: true
+            })
+            await newUser.save()
+
+            const token = jwt.sign({
+                email: newUser.email,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                role: newUser.role,
+                image: newUser.image,
+                isEmailVerified: newUser.isEmailVerified
+        },
+        process.env.JWT_SECRET
+        //{ expiresIn: req.body.rememberme ? "30d" : "48h"}
+    );
+    res.json({
+        message: "Login successful",
+        token: token,
+        role: newUser.role
+    });
+
+        }
+        else{
+            const token = jwt.sign ({
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                role:user.role,
+                image:user.image,
+                isEmailVerified: user.isEmailVerified
+            },
+            process.env.JWT_SECRET
+            //{ expiresIn: req.body.rememberme ? "30d" : "48h"}
+        );
+        res.json({
+            message: "Login successful",
+            token: token,
+            role: user.role
+        })
         }
     }
     catch(error){
